@@ -5,18 +5,29 @@ export default function Jobs() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [jobs, setJobs] = useState([]);
+  const [error, setError] = useState("");
 
   async function loadJobs() {
-    const data = await getJobs();
-    setJobs(data);
+    try {
+      const data = await getJobs();
+      setJobs(data);
+    } catch {
+      setError("Failed to load jobs");
+    }
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    await createJob({ title, content });
-    setTitle("");
-    setContent("");
-    loadJobs();
+    setError("");
+
+    try {
+      await createJob({ title, content });
+      setTitle("");
+      setContent("");
+      loadJobs();
+    } catch {
+      setError("Failed to save job");
+    }
   }
 
   useEffect(() => {
@@ -25,13 +36,15 @@ export default function Jobs() {
 
   return (
     <div>
-      <h2>Jobs</h2>
+      <h2>💼 Jobs</h2>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
       <form onSubmit={handleSubmit}>
         <input
           placeholder="Title"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={e => setTitle(e.target.value)}
           required
         />
         <br />
@@ -39,7 +52,7 @@ export default function Jobs() {
         <textarea
           placeholder="Job description"
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={e => setContent(e.target.value)}
           required
         />
         <br />
@@ -50,7 +63,7 @@ export default function Jobs() {
       <hr />
 
       <ul>
-        {jobs.map((j) => (
+        {jobs.map(j => (
           <li key={j.id}>
             <strong>{j.title}</strong>
           </li>

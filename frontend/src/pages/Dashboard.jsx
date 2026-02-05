@@ -1,20 +1,34 @@
 import { useEffect, useState } from "react";
-
-const API_BASE = import.meta.env.VITE_API_BASE;
+import API_BASE from "../api/config";
 
 function Dashboard() {
   const [analyses, setAnalyses] = useState([]);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`${API_BASE}/Analyses`)
-      .then(res => res.json())
-      .then(setAnalyses)
-      .catch(console.error);
+    async function loadAnalyses() {
+      try {
+        const res = await fetch(`${API_BASE}/analyses`);
+
+        if (!res.ok) {
+          throw new Error(await res.text());
+        }
+
+        setAnalyses(await res.json());
+      } catch (err) {
+        console.error(err);
+        setError("Could not load recent analyses");
+      }
+    }
+
+    loadAnalyses();
   }, []);
 
   return (
     <div style={{ padding: 20 }}>
       <h2>📋 Recent Analyses</h2>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
       <table border="1" cellPadding="8">
         <thead>
