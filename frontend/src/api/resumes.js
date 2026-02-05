@@ -1,27 +1,24 @@
-const API_BASE_URL =
-  "https://newresumeai-axbvfqhmh3cygebd.southindia-01.azurewebsites.net/api";
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 export async function getResumes() {
-  const res = await fetch(`${API_BASE_URL}/getresumes`);
+  const res = await fetch(`${API_BASE}/getresumes`);
 
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text);
+    throw new Error(await res.text());
   }
 
   return res.json();
 }
 
 export async function createResume(data) {
-  const res = await fetch(`${API_BASE_URL}/createresumes`, {
+  const res = await fetch(`${API_BASE}/createresumes`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
 
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text);
+    throw new Error(await res.text());
   }
 
   return res.json();

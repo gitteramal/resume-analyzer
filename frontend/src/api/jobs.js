@@ -1,5 +1,4 @@
-const API_BASE_URL =
-  "https://newresumeai-axbvfqhmh3cygebd.southindia-01.azurewebsites.net/api";
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 export async function getJobs() {
   const res = await fetch(`${API_BASE_URL}/getjobs`);
