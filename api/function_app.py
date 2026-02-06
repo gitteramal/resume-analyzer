@@ -375,7 +375,7 @@ def GetAnalysis(req: func.HttpRequest) -> func.HttpResponse:
 )
 
 # ---------- GET /DashboardAnalyses ----------
-@app.route(route="Analyses", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET"])
+@app.route(route="analyses", auth_level=func.AuthLevel.ANONYMOUS, methods=["GET"])
 def GetAllAnalyses(req: func.HttpRequest) -> func.HttpResponse:
     try:
         conn = get_db_connection()
