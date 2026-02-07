@@ -22,8 +22,7 @@ function Analyses() {
       const res = await fetch(`${API_BASE}/getresumes`);
       if (!res.ok) throw new Error(await res.text());
       setResumes(await res.json());
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError("Failed to load resumes");
     }
   }
@@ -33,8 +32,7 @@ function Analyses() {
       const res = await fetch(`${API_BASE}/getjobs`);
       if (!res.ok) throw new Error(await res.text());
       setJobs(await res.json());
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError("Failed to load jobs");
     }
   }
@@ -59,10 +57,8 @@ function Analyses() {
       }
 
       if (!res.ok) throw new Error(await res.text());
-
       setAnalysis(await res.json());
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError("Failed to load existing analysis");
     }
   }
@@ -79,10 +75,8 @@ function Analyses() {
       });
 
       if (!res.ok) throw new Error(await res.text());
-
       setAnalysis(await res.json());
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError("Failed to run analysis");
     } finally {
       setLoading(false);
@@ -90,61 +84,103 @@ function Analyses() {
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>AI Resume Analysis</h2>
+    <div className="analysis-card">
+      <h3 className="card-title">🧠 AI Resume Analysis</h3>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="error-text">{error}</p>}
 
-      <select value={resumeId} onChange={e => setResumeId(e.target.value)}>
-        <option value="">Select Resume</option>
-        {resumes.map(r => (
-          <option key={r.id} value={r.id}>{r.title}</option>
-        ))}
-      </select>
+      {/* Selectors */}
+      <div className="select-row">
+        <select
+          className="select"
+          value={resumeId}
+          onChange={(e) => setResumeId(e.target.value)}
+        >
+          <option value="">Select Resume</option>
+          {resumes.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.title}
+            </option>
+          ))}
+        </select>
 
-      <select value={jobId} onChange={e => setJobId(e.target.value)}>
-        <option value="">Select Job</option>
-        {jobs.map(j => (
-          <option key={j.id} value={j.id}>{j.title}</option>
-        ))}
-      </select>
+        <select
+          className="select"
+          value={jobId}
+          onChange={(e) => setJobId(e.target.value)}
+        >
+          <option value="">Select Job</option>
+          {jobs.map((j) => (
+            <option key={j.id} value={j.id}>
+              {j.title}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      <br /><br />
-
+      {/* Action Button */}
       <button
+        className="primary-btn full-width"
         onClick={runAnalysis}
         disabled={!resumeId || !jobId || loading}
       >
-        {loading ? "Analyzing..." : analysis ? "Re-run Analysis" : "Run Analysis"}
+        {loading
+          ? "Analyzing..."
+          : analysis
+          ? "🔁 Re-run Analysis"
+          : "🚀 Run Analysis"}
       </button>
 
+      {/* Analysis Result */}
       {analysis && (
-        <div style={{ marginTop: 20 }}>
-          <h3>Overall Score: {analysis.overallScore}%</h3>
-          <p>Skill Match: {analysis.skillMatchScore}%</p>
+        <div className="analysis-result">
+          {/* Scores */}
+          <div className="score-grid">
+            <div className="score-box">
+              <span className="score-label">Overall Match</span>
+              <span className="score-value">{analysis.overallScore}%</span>
+            </div>
 
-          <h4>Strengths</h4>
-          <ul>
-            {(analysis.strengths || []).map((s, i) => (
-              <li key={i}>{s}</li>
-            ))}
-          </ul>
+            <div className="score-box">
+              <span className="score-label">Skill Match</span>
+              <span className="score-value">{analysis.skillMatchScore}%</span>
+            </div>
+          </div>
 
-          <h4>Missing Skills</h4>
-          <ul>
-            {(analysis.missingSkills || []).map((s, i) => (
-              <li key={i}>{s}</li>
-            ))}
-          </ul>
+          {/* Details */}
+          <AnalysisSection
+            title="✅ Strengths"
+            items={analysis.strengths}
+          />
 
-          <h4>Improvements</h4>
-          <ul>
-            {(analysis.improvements || []).map((s, i) => (
-              <li key={i}>{s}</li>
-            ))}
-          </ul>
+          <AnalysisSection
+            title="❌ Missing Skills"
+            items={analysis.missingSkills}
+            danger
+          />
+
+          <AnalysisSection
+            title="📈 Improvements"
+            items={analysis.improvements}
+          />
         </div>
       )}
+    </div>
+  );
+}
+
+/* Reusable sub-section */
+function AnalysisSection({ title, items = [], danger }) {
+  if (!items.length) return null;
+
+  return (
+    <div className="analysis-section">
+      <h4 className={danger ? "danger-title" : ""}>{title}</h4>
+      <ul className="analysis-list">
+        {items.map((item, i) => (
+          <li key={i}>{item}</li>
+        ))}
+      </ul>
     </div>
   );
 }

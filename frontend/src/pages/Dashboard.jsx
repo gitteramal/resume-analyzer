@@ -9,14 +9,9 @@ function Dashboard() {
     async function loadAnalyses() {
       try {
         const res = await fetch(`${API_BASE}/analyses`);
-
-        if (!res.ok) {
-          throw new Error(await res.text());
-        }
-
+        if (!res.ok) throw new Error(await res.text());
         setAnalyses(await res.json());
-      } catch (err) {
-        console.error(err);
+      } catch {
         setError("Could not load recent analyses");
       }
     }
@@ -25,35 +20,56 @@ function Dashboard() {
   }, []);
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>📋 Recent Analyses</h2>
+    <div className="dashboard-card">
+      <h3 className="card-title">📋 Recent Analyses</h3>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="error-text">{error}</p>}
 
-      <table border="1" cellPadding="8">
-        <thead>
-          <tr>
-            <th>Resume</th>
-            <th>Job</th>
-            <th>Overall Score</th>
-            <th>Skill Match</th>
-            <th>Created</th>
-          </tr>
-        </thead>
-        <tbody>
-          {analyses.map(a => (
-            <tr key={a.id}>
-              <td>{a.resumeTitle}</td>
-              <td>{a.jobTitle}</td>
-              <td>{a.overallScore}%</td>
-              <td>{a.skillMatchScore}%</td>
-              <td>{new Date(a.createdUtc).toLocaleString()}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {analyses.length === 0 ? (
+        <p className="muted">No analyses available yet</p>
+      ) : (
+        <div className="table-wrapper">
+          <table className="dashboard-table">
+            <thead>
+              <tr>
+                <th>Resume</th>
+                <th>Job</th>
+                <th>Overall</th>
+                <th>Skill Match</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              {analyses.map((a) => (
+                <tr key={a.id}>
+                  <td>{a.resumeTitle}</td>
+                  <td>{a.jobTitle}</td>
+                  <td>
+                    <ScoreBadge value={a.overallScore} />
+                  </td>
+                  <td>
+                    <ScoreBadge value={a.skillMatchScore} />
+                  </td>
+                  <td className="muted">
+                    {new Date(a.createdUtc).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
+}
+
+/* Score badge component */
+function ScoreBadge({ value }) {
+  let color = "badge-low";
+  if (value >= 75) color = "badge-high";
+  else if (value >= 50) color = "badge-mid";
+
+  return <span className={`score-badge ${color}`}>{value}%</span>;
 }
 
 export default Dashboard;

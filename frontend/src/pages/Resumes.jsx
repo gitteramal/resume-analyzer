@@ -5,6 +5,7 @@ export default function Resumes() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [resumes, setResumes] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   async function loadResumes() {
     const data = await getResumes();
@@ -13,10 +14,12 @@ export default function Resumes() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    setLoading(true);
     await createResume({ title, content });
     setTitle("");
     setContent("");
-    loadResumes();
+    await loadResumes();
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -24,38 +27,47 @@ export default function Resumes() {
   }, []);
 
   return (
-    <div>
-      <h2>Resumes</h2>
+    <div className="resume-card">
+      <h3 className="card-title">📄 Add Resume</h3>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="form">
         <input
-          placeholder="Title"
+          className="input"
+          placeholder="Resume title (eg: Java Developer – 3 yrs)"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
         />
-        <br />
 
         <textarea
-          placeholder="Resume content"
+          className="textarea"
+          placeholder="Paste resume content here…"
           value={content}
           onChange={(e) => setContent(e.target.value)}
+          rows={6}
           required
         />
-        <br />
 
-        <button>Add Resume</button>
+        <button className="primary-btn" disabled={loading}>
+          {loading ? "Saving..." : "➕ Add Resume"}
+        </button>
       </form>
 
-      <hr />
+      <div className="divider" />
 
-      <ul>
-        {resumes.map((r) => (
-          <li key={r.id}>
-            <strong>{r.title}</strong>
-          </li>
-        ))}
-      </ul>
+      <h4 className="list-title">📚 Saved Resumes</h4>
+
+      {resumes.length === 0 ? (
+        <p className="muted">No resumes added yet</p>
+      ) : (
+        <ul className="resume-list">
+          {resumes.map((r) => (
+            <li key={r.id} className="resume-item">
+              <span>{r.title}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

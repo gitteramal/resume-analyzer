@@ -6,27 +6,31 @@ export default function Jobs() {
   const [content, setContent] = useState("");
   const [jobs, setJobs] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function loadJobs() {
     try {
       const data = await getJobs();
       setJobs(data);
     } catch {
-      setError("Failed to load jobs");
+      setError("Failed to load job descriptions");
     }
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
       await createJob({ title, content });
       setTitle("");
       setContent("");
-      loadJobs();
+      await loadJobs();
     } catch {
-      setError("Failed to save job");
+      setError("Failed to save job description");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -35,40 +39,49 @@ export default function Jobs() {
   }, []);
 
   return (
-    <div>
-      <h2>💼 Jobs</h2>
+    <div className="resume-card">
+      <h3 className="card-title">💼 Add Job Description</h3>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="error-text">{error}</p>}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="form">
         <input
-          placeholder="Title"
+          className="input"
+          placeholder="Job title (eg: Frontend Developer)"
           value={title}
-          onChange={e => setTitle(e.target.value)}
+          onChange={(e) => setTitle(e.target.value)}
           required
         />
-        <br />
 
         <textarea
-          placeholder="Job description"
+          className="textarea"
+          placeholder="Paste full job description here…"
           value={content}
-          onChange={e => setContent(e.target.value)}
+          onChange={(e) => setContent(e.target.value)}
+          rows={6}
           required
         />
-        <br />
 
-        <button>Add Job</button>
+        <button className="primary-btn" disabled={loading}>
+          {loading ? "Saving..." : "➕ Add Job"}
+        </button>
       </form>
 
-      <hr />
+      <div className="divider" />
 
-      <ul>
-        {jobs.map(j => (
-          <li key={j.id}>
-            <strong>{j.title}</strong>
-          </li>
-        ))}
-      </ul>
+      <h4 className="list-title">📋 Saved Jobs</h4>
+
+      {jobs.length === 0 ? (
+        <p className="muted">No job descriptions added yet</p>
+      ) : (
+        <ul className="resume-list">
+          {jobs.map((j) => (
+            <li key={j.id} className="resume-item">
+              <span>{j.title}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

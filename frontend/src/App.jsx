@@ -6,61 +6,51 @@ import SkillsReport from "./pages/SkillsReport";
 
 function App() {
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto", padding: 20 }}>
-      
+    <div className="app-container">
       {/* Header */}
-      <header style={{ textAlign: "center", marginBottom: 40 }}>
+      <header className="app-header">
         <h1>🧠 AI Resume Analyzer</h1>
-        <p style={{ color: "#666" }}>
-          Compare resumes against job descriptions using AI
-        </p>
+        <p>Compare resumes against job descriptions using AI</p>
       </header>
 
       {/* Dashboard */}
-      <section style={{ marginBottom: 50 }}>
+      <section className="section">
         <Dashboard />
       </section>
 
       <hr />
 
       {/* Resume + Job Input */}
-      <section style={{ marginTop: 40 }}>
+      <section className="section">
         <h2>📄 Input Data</h2>
 
-        <div
-          style={{
-            display: "flex",
-            gap: 40,
-            alignItems: "flex-start",
-            marginTop: 20
-          }}
-        >
-          <div style={{ flex: 1 }}>
+        <div className="input-grid">
+          <div className="card">
             <Resumes />
           </div>
 
-          <div style={{ flex: 1 }}>
+          <div className="card">
             <Jobs />
           </div>
         </div>
       </section>
 
-      <hr style={{ margin: "50px 0" }} />
+      <hr />
 
       {/* Analysis */}
-      <section>
+      <section className="section">
         <Analyses />
       </section>
 
-      <hr style={{ margin: "50px 0" }} />
+      <hr />
 
       {/* Reports */}
-      <section>
+      <section className="section">
         <SkillsReport />
       </section>
 
       {/* Footer */}
-      <footer style={{ marginTop: 60, textAlign: "center", color: "#999" }}>
+      <footer className="footer">
         AI Resume Analyzer • Demo Project
       </footer>
     </div>
